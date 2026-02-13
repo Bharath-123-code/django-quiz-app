@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Result</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .result-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            background: #11998e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        a:hover {
+            background: #0f7f73;
+        }
+    </style>
+</head>
+<body>
+
+<div class="result-box">
+    <h1>Quiz Completed 🎉</h1>
+    <div class="score">
+        Your Score: {{ score }} / {{ total }}
+    </div>
+
+    <a href="/">Play Again</a>
+</div>
+
+</body>
+</html>
+

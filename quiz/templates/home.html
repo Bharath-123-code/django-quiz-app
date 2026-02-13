@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mini Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .quiz-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-box">
+    <h1>Mini Quiz</h1>
+
+    <form method="POST" id="quizForm">
+        {% csrf_token %}
+
+        {% for q in questions %}
+            <div class="question-box {% if not forloop.first %}hidden{% endif %}">
+                <div class="question">
+                    {{ forloop.counter }}. {{ q.question }}
+                </div>
+                <input type="text" name="question{{ forloop.counter0 }}">
+                <br>
+                {% if not forloop.last %}
+                    <button type="button" onclick="nextQuestion()">Next</button>
+                {% else %}
+                    <button type="submit">Submit</button>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </form>
+</div>
+
+<script>
+    let currentQuestion = 0;
+    const questions = document.querySelectorAll('.question-box');
+
+    function nextQuestion() {
+        questions[currentQuestion].classList.add('hidden');
+        currentQuestion++;
+        questions[currentQuestion].classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
