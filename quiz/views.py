@@ -1,68 +1,39 @@
-# from django.shortcuts import render
-
-# def home(request):
-#     return render(request, 'home.html')
-
-from django.shortcuts import render
-
-questions = [
-    {
-        'question': 'What is the capital of India?',
-        'answer': 'New Delhi'
-    },
-    {
-        'question': 'What is the largest mammal?',
-        'answer': 'Blue Whale'
-    },
-    {
-        'question': 'What is the smallest planet?',
-        'answer': 'Mercury'
-    },
-    {
-        'question': 'What is the chemical symbol for water?',
-        'answer': 'H2O'
-    },
-    {
-        'question':'How many continents are there on Earth?',
-        'answer':'7'
-    },
-    {
-        'question':'How many colors are there in a rainbow?',
-        'answer':'7'
-    },
-    {
-        'question':'How many states are there in India?',
-        'answer':'28'
-    },
-    {
-        'question':'What is the full form of ICC?',
-        'answer':'International Cricket Council'
-    },
-    {
-        'question':'what is the full form of ISRO?',
-        'answer':'Indian Space Research Organisation'
-    },
-    {
-        'question': 'Who won the 2024 cricket world cup?',
-        'answer': 'India'
-    }
-
-]
+from django.shortcuts import render, redirect
+from .models import Question, HighScore
 
 def home(request):
     if request.method == "POST":
         score = 0
+        review_data = []
+        player_name = request.POST.get('player_name', 'Anonymous')
         
-        for i, q in enumerate(questions):
-            user_answer = request.POST.get(f'question{i}')
-            
-            if user_answer and user_answer.strip().lower() == q['answer'].lower():
-                score += 1
+        # We need to reconstruct the questions that were shown
+        for key, value in request.POST.items():
+            if key.startswith('question_'):
+                q_id = key.split('_')[1]
+                question = Question.objects.get(id=q_id)
+                is_correct = (value == question.correct_answer)
+                
+                if is_correct:
+                    score += 1
+                
+                review_data.append({
+                    'text': question.question_text,
+                    'user_choice': value,
+                    'correct_answer': question.correct_answer,
+                    'is_correct': is_correct
+                })
+
+        # Save to Leaderboard
+        HighScore.objects.create(player_name=player_name, score=score)
+        leaderboard = HighScore.objects.all()[:10]
 
         return render(request, 'result.html', {
             'score': score,
-            'total': len(questions)
+            'total': len(review_data),
+            'review_data': review_data,
+            'leaderboard': leaderboard
         })
 
+    questions = Question.objects.order_by('?')[:15]
     return render(request, 'home.html', {'questions': questions})
-

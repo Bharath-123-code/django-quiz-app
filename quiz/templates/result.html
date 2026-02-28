@@ -1,59 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Quiz Result</title>
+    <title>Quiz Results & Leaderboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=堅swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6C63FF;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
         body {
-            font-family: Arial;
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            margin: 0; padding: 40px 20px;
+            display: flex; justify-content: center;
         }
+        .container {
+            width: 100%; max-width: 1000px;
+            display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;
+        }
+        .card {
+            background: var(--glass); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h2 { color: #333; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        /* Score Section */
+        .score-banner {
+            grid-column: 1 / -1; text-align: center; background: white;
+            padding: 20px; border-radius: 15px; margin-bottom: 10px;
+        }
+        .score-val { font-size: 40px; font-weight: bold; color: var(--primary); }
 
-        .result-box {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            width: 350px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        /* Review Cards */
+        .review-scroll { max-height: 600px; overflow-y: auto; padding-right: 10px; }
+        .review-item {
+            background: white; margin-bottom: 15px; padding: 15px;
+            border-radius: 12px; border-left: 5px solid #ccc;
+            transition: 0.3s;
         }
+        .review-item.correct { border-left-color: var(--success); }
+        .review-item.wrong { border-left-color: var(--danger); }
+        .q-text { font-weight: 600; margin-bottom: 8px; display: block; }
+        .ans-row { font-size: 14px; margin: 4px 0; }
+        .label { font-weight: 600; min-width: 100px; display: inline-block; }
 
-        h1 {
-            margin-bottom: 20px;
-        }
+        /* Leaderboard Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: #666; font-size: 14px; padding: 10px; }
+        td { padding: 12px 10px; border-bottom: 1px solid #eee; }
+        tr:first-child td { font-weight: bold; color: #f1c40f; } /* Gold for #1 */
 
-        .score {
-            font-size: 24px;
-            margin-bottom: 20px;
+        .btn-retry {
+            display: inline-block; margin-top: 20px; background: var(--primary);
+            color: white; padding: 12px 30px; border-radius: 10px;
+            text-decoration: none; font-weight: 600; transition: 0.3s;
         }
+        .btn-retry:hover { background: #5851db; transform: scale(1.05); }
 
-        a {
-            text-decoration: none;
-            background: #11998e;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-        }
-
-        a:hover {
-            background: #0f7f73;
-        }
+        /* Custom Scrollbar */
+        .review-scroll::-webkit-scrollbar { width: 6px; }
+        .review-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="result-box">
-    <h1>Quiz Completed 🎉</h1>
-    <div class="score">
-        Your Score: {{ score }} / {{ total }}
+<div class="container">
+    <div class="score-banner card">
+        <h1>Quiz Performance</h1>
+        <div class="score-val">{{ score }} / {{ total }}</div>
+        <p>{% if score >= 8 %}🏆 Excellent Work!{% else %}💡 Keep Practicing!{% endif %}</p>
+        <a href="{% url 'home' %}" class="btn-retry">Try Again</a>
     </div>
 
-    <a href="/">Play Again</a>
+    <div class="card">
+        <h2>Answer Review</h2>
+        <div class="review-scroll">
+            {% for item in review_data %}
+            <div class="review-item {% if item.is_correct %}correct{% else %}wrong{% endif %}">
+                <span class="q-text">{{ forloop.counter }}. {{ item.text }}</span>
+                <div class="ans-row">
+                    <span class="label">Your Choice:</span> 
+                    <span style="color: {% if item.is_correct %}var(--success){% else %}var(--danger){% endif %};">
+                        {{ item.user_choice|default:"No Answer" }}
+                    </span>
+                </div>
+                {% if not item.is_correct %}
+                <div class="ans-row">
+                    <span class="label">Correct:</span> 
+                    <span style="color: var(--success); font-weight: 600;">{{ item.correct_answer }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Global Leaderboard</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in leaderboard %}
+                <tr>
+                    <td>#{{ forloop.counter }}</td>
+                    <td>{{ entry.player_name }}</td>
+                    <td><strong>{{ entry.score }}</strong></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">No scores yet! Be the first.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 </body>
 </html>
-
