@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Question, HighScore
+import random
 
 def home(request):
     if request.method == "POST":
@@ -35,5 +36,12 @@ def home(request):
             'leaderboard': leaderboard
         })
 
-    questions = Question.objects.order_by('?')[:15]
-    return render(request, 'home.html', {'questions': questions})
+    # Get all questions and select 15 random ones
+    all_questions = list(Question.objects.all())
+    if len(all_questions) >= 15:
+        questions = random.sample(all_questions, 15)
+    else:
+        questions = all_questions  # If fewer than 15 questions, use all available
+    return render(request, 'home.html', {
+        'questions': questions
+    })

@@ -2,61 +2,260 @@
 <html>
 <head>
     <title>Ultimate Quiz</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6C63FF; --secondary: #3f3d56; --success: #2ecc71; --danger: #e74c3c; }
+        :root {
+            --primary: #6C63FF;
+            --primary-strong: #5347d6;
+            --secondary: #22203f;
+            --surface: rgba(255,255,255,0.88);
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --muted: #6b7280;
+        }
+        * { box-sizing: border-box; }
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: #1f1d34;
+            background: linear-gradient(135deg, rgba(78, 95, 190, 0.1) 0%, rgba(146, 99, 242,0.0) 100%),
+                url("{% static 'quiz/hero_img.jpg' %}") center/cover no-repeat fixed;
+            background-attachment: fixed;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 10, 35, 0.50);
+            pointer-events: none;
+        }
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            padding: 40px 20px;
+            display: grid;
+            place-items: center;
+        }
+        .hero-panel {
+            width: min(900px, 100%);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            align-items: start;
         }
         .glass-card {
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-            padding: 40px; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            width: 450px; text-align: center; transform: translateY(0); transition: 0.3s;
+            background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(50,20,80,0.15) 100%),
+                url("{% static 'quiz/quiz1.jpg' %}") center/cover;
+            position: relative;
+            border-radius: 28px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 500px;
         }
-        .progress-container { width: 100%; background: #eee; height: 8px; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: var(--primary); transition: 0.4s; }
+        .glass-card h1 {
+            margin: 0 0 15px;
+            font-size: clamp(2rem, 3vw, 3.2rem);
+            letter-spacing: -0.05em;
+            color: white;
+            font-weight: 800;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .glass-card p {
+            margin: 0 0 32px;
+            color: rgba(255,255,255,0.95);
+            line-height: 1.7;
+            font-size: 1.05rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .quiz-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .step-info {
+            font-weight: 600;
+            color: #343243;
+        }
+        .timer-circle {
+            padding: 14px 24px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255,70,70,0.9) 0%, rgba(255,100,100,0.85) 100%);
+            color: white;
+            font-weight: 800;
+            min-width: 150px;
+            text-align: center;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 20px rgba(255,70,70,0.4);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.55);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #7f71ff);
+            transition: width 0.35s ease;
+        }
         .option-label {
-            display: block; background: #f1f3f8; padding: 15px; margin: 10px 0; border-radius: 12px;
-            cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+            display: block;
+            border: 1px solid rgba(99,88,246,0.15);
+            background: white;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .option-label:hover { transform: scale(1.02); background: #e8ebf3; border-color: var(--primary); }
-        input[type="radio"]:checked + span { font-weight: bold; color: var(--primary); }
-        .timer-circle { font-size: 24px; font-weight: bold; color: var(--danger); margin-bottom: 15px; }
-        .hidden { display: none; }
-        .btn { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-size: 16px; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4); }
-        input[type="text"] { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; }
+        .option-label:hover {
+            transform: translateY(-1px);
+            border-color: rgba(108,99,255,0.35);
+            box-shadow: 0 18px 35px rgba(59,46,160,0.09);
+        }
+        .option-label input {
+            margin-right: 12px;
+            accent-color: var(--primary);
+        }
+        .option-label span {
+            vertical-align: middle;
+        }
+        .option-label input:checked + span {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 26px;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), #7a6bff);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn-secondary {
+            background: #f5f5ff;
+            color: var(--secondary);
+            box-shadow: inset 0 0 0 1px rgba(99,88,246,0.15);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(99,88,246,0.22);
+            background: rgba(255,255,255,0.95);
+            margin-bottom: 22px;
+            font-size: 1rem;
+        }
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        .hidden {
+            display: none;
+        }
+        .leaderboard-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 10px;
+        }
+        .leaderboard-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.82);
+            box-shadow: 0 16px 40px rgba(5,7,29,0.08);
+        }
+        .leaderboard-list li > div {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .leaderboard-list .player { font-weight: 600; }
+        .leaderboard-list .meta { font-size: 0.88rem; color: #7f7bb0; }
+        .leaderboard-list .score { color: var(--primary); }
+        @media (max-width: 900px) {
+            .hero-panel { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-
-<div class="glass-card">
-    <div id="start-screen">
-        <h2>Enter Your Name</h2>
-        <input type="text" id="p_name" placeholder="Ex: QuizMaster" required>
-        <button class="btn" onclick="startQuiz()">Start Quiz</button>
-    </div>
-
-    <div id="quiz-content" class="hidden">
-        <div class="timer-circle">Time: <span id="timer">30</span>s</div>
-        <div class="progress-container"><div id="progress-bar"></div></div>
-        
-        <form method="POST" id="quizForm">
-            {% csrf_token %}
-            <input type="hidden" name="player_name" id="hidden_name">
-            {% for q in questions %}
-            <div class="q-step {% if not forloop.first %}hidden{% endif %}" id="q-{{ forloop.index0 }}">
-                <h3>{{ q.question_text }}</h3>
-                <div style="text-align: left;">
-                    <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option1 }}"> <span>{{ q.option1 }}</span></label>
-                    <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option2 }}"> <span>{{ q.option2 }}</span></label>
-                    <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option3 }}"> <span>{{ q.option3 }}</span></label>
-                    <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option4 }}"> <span>{{ q.option4 }}</span></label>
-                </div>
-                {% if not forloop.last %}<button type="button" class="btn" onclick="nextQ()">Next</button>
-                {% else %}<button type="submit" class="btn">Finish</button>{% endif %}
+<div class="page-shell">
+    <div class="hero-panel">
+        <div class="glass-card">
+            <div>
+                <h1>Welcome to the Quiz</h1>
+                <p>Please enter your name below and click Start Quiz to begin.</p>
             </div>
-            {% endfor %}
-        </form>
+
+            <div id="start-screen">
+                <h2 style="color: white; font-size: 1.8rem; margin-bottom: 24px; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">Please enter your name</h2>
+                <input type="text" id="p_name" placeholder="Ex: QuizMaster" required style="background: rgba(255,255,255,0.98); border: 2px solid rgba(108,99,255,0.3);">
+                <button class="btn" onclick="startQuiz()" style="width: 100%; padding: 16px 30px; font-size: 1.1rem; box-shadow: 0 8px 20px rgba(108,99,255,0.4);">Start Quiz</button>
+            </div>
+
+            <div id="quiz-content" class="hidden">
+                <div class="quiz-toolbar">
+                    <div class="step-info">Question <span id="current-step">1</span> of <span id="total-steps">{{ questions|length }}</span></div>
+                    <div class="timer-circle">Time: <span id="timer">30</span>s</div>
+                </div>
+                <div class="progress-container"><div id="progress-bar"></div></div>
+                <form method="POST" id="quizForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="player_name" id="hidden_name">
+                    {% for q in questions %}
+                    <div class="q-step {% if not forloop.first %}hidden{% endif %}" id="q-{{ forloop.counter0 }}">
+                        <h3>{{ q.question_text }}</h3>
+                        <div>
+                            <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option1 }}"><span>{{ q.option1 }}</span></label>
+                            <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option2 }}"><span>{{ q.option2 }}</span></label>
+                            <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option3 }}"><span>{{ q.option3 }}</span></label>
+                            <label class="option-label"><input type="radio" name="question_{{ q.id }}" value="{{ q.option4 }}"><span>{{ q.option4 }}</span></label>
+                        </div>
+                        <div class="btn-row">
+                            {% if not forloop.first %}
+                            <button type="button" class="btn btn-secondary" onclick="prevQ()">Previous</button>
+                            {% endif %}
+                            {% if not forloop.last %}
+                            <button type="button" class="btn" onclick="nextQ()">Next</button>
+                            {% endif %}
+                            <button type="submit" class="btn">Submit Quiz</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -67,18 +266,18 @@
     let timer;
 
     function startQuiz() {
-        const name = document.getElementById('p_name').value;
-        if (!name) return alert("Enter a name!");
+        const name = document.getElementById('p_name').value.trim();
+        if (!name) return alert('Please enter your name to begin.');
         document.getElementById('hidden_name').value = name;
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('quiz-content').classList.remove('hidden');
+        updateProgress();
         runTimer();
     }
 
     function runTimer() {
         timeLeft = 30;
         document.getElementById('timer').innerText = timeLeft;
-        document.getElementById('progress-bar').style.width = ((current + 1) / steps.length * 100) + "%";
         clearInterval(timer);
         timer = setInterval(() => {
             timeLeft--;
@@ -87,13 +286,30 @@
         }, 1000);
     }
 
+    function updateProgress() {
+        document.getElementById('current-step').innerText = current + 1;
+        document.getElementById('progress-bar').style.width = ((current + 1) / steps.length * 100) + '%';
+    }
+
     function nextQ() {
         if (current < steps.length - 1) {
             steps[current].classList.add('hidden');
             current++;
             steps[current].classList.remove('hidden');
+            updateProgress();
             runTimer();
-        } else { document.getElementById('quizForm').submit(); }
+        } else {
+            document.getElementById('quizForm').submit();
+        }
+    }
+
+    function prevQ() {
+        if (current === 0) return;
+        steps[current].classList.add('hidden');
+        current--;
+        steps[current].classList.remove('hidden');
+        updateProgress();
+        runTimer();
     }
 </script>
 </body>

@@ -2,125 +2,187 @@
 <html>
 <head>
     <title>Quiz Results & Leaderboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=堅swap" rel="stylesheet">
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6C63FF;
             --success: #2ecc71;
             --danger: #e74c3c;
-            --glass: rgba(255, 255, 255, 0.9);
+            --glass: rgba(255, 255, 255, 0.88);
+            --surface: rgba(17, 21, 49, 0.65);
         }
+        * { box-sizing: border-box; }
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            min-height: 100vh;
             font-family: 'Poppins', sans-serif;
-            margin: 0; padding: 40px 20px;
-            display: flex; justify-content: center;
+            color: #1c1b33;
+            background: linear-gradient(180deg, rgba(19,20,36,0.82) 0%, rgba(64,51,111,0.95) 100%),
+                url("{% static 'quiz/quiz1.jpg' %}") center/cover no-repeat;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 18, 50, 0.6);
+            pointer-events: none;
+        }
+        body > div {
+            position: relative;
+            z-index: 1;
+            padding: 36px 22px 60px;
+            display: flex;
+            justify-content: center;
         }
         .container {
-            width: 100%; max-width: 1000px;
-            display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;
+            width: min(1100px, 100%);
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 28px;
         }
         .card {
-            background: var(--glass); backdrop-filter: blur(10px);
-            border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: var(--glass);
+            border-radius: 26px;
+            padding: 28px;
+            box-shadow: 0 28px 75px rgba(4, 10, 38, 0.16);
+            backdrop-filter: blur(14px);
         }
-        h2 { color: #333; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        
-        /* Score Section */
+        h1, h2 { margin-top: 0; }
         .score-banner {
-            grid-column: 1 / -1; text-align: center; background: white;
-            padding: 20px; border-radius: 15px; margin-bottom: 10px;
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 28px 24px;
+            border-radius: 26px;
+            background: white;
         }
-        .score-val { font-size: 40px; font-weight: bold; color: var(--primary); }
-
-        /* Review Cards */
-        .review-scroll { max-height: 600px; overflow-y: auto; padding-right: 10px; }
+        .score-banner h1 { font-size: 2.5rem; }
+        .score-val {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 18px 0 8px;
+        }
+        .score-banner p {
+            color: #4f4b70;
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+        }
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+        }
+        th {
+            color: #625f7e;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        td {
+            background: rgba(255,255,255,0.92);
+            border-radius: 18px;
+            margin-bottom: 8px;
+        }
+        tbody tr + tr td { margin-top: 10px; }
+        tr:first-child td { color: #d4a017; font-weight: 700; }
+        .review-scroll {
+            max-height: 640px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
         .review-item {
-            background: white; margin-bottom: 15px; padding: 15px;
-            border-radius: 12px; border-left: 5px solid #ccc;
-            transition: 0.3s;
+            background: white;
+            padding: 18px 20px;
+            border-radius: 18px;
+            margin-bottom: 16px;
+            border-left: 6px solid #ccc;
         }
         .review-item.correct { border-left-color: var(--success); }
         .review-item.wrong { border-left-color: var(--danger); }
-        .q-text { font-weight: 600; margin-bottom: 8px; display: block; }
-        .ans-row { font-size: 14px; margin: 4px 0; }
-        .label { font-weight: 600; min-width: 100px; display: inline-block; }
-
-        /* Leaderboard Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: #666; font-size: 14px; padding: 10px; }
-        td { padding: 12px 10px; border-bottom: 1px solid #eee; }
-        tr:first-child td { font-weight: bold; color: #f1c40f; } /* Gold for #1 */
-
+        .q-text { display: block; font-weight: 700; margin-bottom: 10px; }
+        .ans-row { margin: 6px 0; line-height: 1.55; }
+        .label { display: inline-block; min-width: 110px; font-weight: 700; }
         .btn-retry {
-            display: inline-block; margin-top: 20px; background: var(--primary);
-            color: white; padding: 12px 30px; border-radius: 10px;
-            text-decoration: none; font-weight: 600; transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 30px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary), #7b6dff);
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 20px;
         }
-        .btn-retry:hover { background: #5851db; transform: scale(1.05); }
-
-        /* Custom Scrollbar */
-        .review-scroll::-webkit-scrollbar { width: 6px; }
-        .review-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .btn-retry:hover { opacity: 0.95; }
+        @media (max-width: 920px) {
+            .container { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
+<div>
+    <div class="container">
+        <div class="score-banner card">
+            <h1>Quiz Performance</h1>
+            <div class="score-val">{{ score }} / {{ total }}</div>
+            <p>{% if score >= 8 %}🏆 Excellent work!{% else %}💡 Keep practicing to improve your rank.{% endif %}</p>
+            <a href="{% url 'home' %}" class="btn-retry">Take Another Quiz</a>
+        </div>
 
-<div class="container">
-    <div class="score-banner card">
-        <h1>Quiz Performance</h1>
-        <div class="score-val">{{ score }} / {{ total }}</div>
-        <p>{% if score >= 8 %}🏆 Excellent Work!{% else %}💡 Keep Practicing!{% endif %}</p>
-        <a href="{% url 'home' %}" class="btn-retry">Try Again</a>
-    </div>
-
-    <div class="card">
-        <h2>Answer Review</h2>
-        <div class="review-scroll">
-            {% for item in review_data %}
-            <div class="review-item {% if item.is_correct %}correct{% else %}wrong{% endif %}">
-                <span class="q-text">{{ forloop.counter }}. {{ item.text }}</span>
-                <div class="ans-row">
-                    <span class="label">Your Choice:</span> 
-                    <span style="color: {% if item.is_correct %}var(--success){% else %}var(--danger){% endif %};">
-                        {{ item.user_choice|default:"No Answer" }}
-                    </span>
+        <div class="card">
+            <h2>Answer Review</h2>
+            <div class="review-scroll">
+                {% for item in review_data %}
+                <div class="review-item {% if item.is_correct %}correct{% else %}wrong{% endif %}">
+                    <span class="q-text">{{ forloop.counter }}. {{ item.text }}</span>
+                    <div class="ans-row">
+                        <span class="label">Your Choice:</span>
+                        <span style="color: {% if item.is_correct %}var(--success){% else %}var(--danger){% endif %}; font-weight: 700;">
+                            {{ item.user_choice|default:"No Answer" }}
+                        </span>
+                    </div>
+                    {% if not item.is_correct %}
+                    <div class="ans-row">
+                        <span class="label">Correct Answer:</span>
+                        <span style="color: var(--success); font-weight: 700;">{{ item.correct_answer }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% if not item.is_correct %}
-                <div class="ans-row">
-                    <span class="label">Correct:</span> 
-                    <span style="color: var(--success); font-weight: 600;">{{ item.correct_answer }}</span>
-                </div>
-                {% endif %}
+                {% endfor %}
             </div>
-            {% endfor %}
+        </div>
+
+        <div class="card">
+            <h2>Global Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in leaderboard %}
+                    <tr>
+                        <td>#{{ forloop.counter }}</td>
+                        <td>{{ entry.player_name }}</td>
+                        <td><strong>{{ entry.score }}</strong></td>
+                        <td>{{ entry.date_achieved|date:'M d, Y H:i' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">No scores yet! Be the first to submit a quiz.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-
-    <div class="card">
-        <h2>Global Leaderboard</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Player</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in leaderboard %}
-                <tr>
-                    <td>#{{ forloop.counter }}</td>
-                    <td>{{ entry.player_name }}</td>
-                    <td><strong>{{ entry.score }}</strong></td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="3">No scores yet! Be the first.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 </div>
-
 </body>
 </html>

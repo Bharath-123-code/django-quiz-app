@@ -44,7 +44,74 @@ questions_data = [
     ["How many continents are there on Earth?", "5", "6", "7", "8", "7"],
     ["What is the smallest prime number?", "0", "1", "2", "3", "2"],
     ["Which instrument measures atmospheric pressure?", "Thermometer", "Barometer", "Hygrometer", "Anemometer", "Barometer"],
+# Science
+    ["What is the chemical symbol for silver?", "Ag", "Au", "Si", "S", "Ag"],
+    ["What part of the plant conducts photosynthesis?", "Root", "Stem", "Leaf", "Flower", "Leaf"],
+    ["Which gas is most abundant in Earth's atmosphere?", "Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen", "Nitrogen"],
+    ["What is H2O commonly known as?", "Hydrogen", "Oxygen", "Water", "Salt", "Water"],
+    ["What force pulls objects toward Earth?", "Magnetism", "Friction", "Gravity", "Electricity", "Gravity"],
+
+# History
+    ["Who was known as the Iron Man of India?", "Mahatma Gandhi", "Sardar Vallabhbhai Patel", "Jawaharlal Nehru", "Subhas Chandra Bose", "Sardar Vallabhbhai Patel"],
+    ["Who was the first Prime Minister of India?", "Rajendra Prasad", "Jawaharlal Nehru", "Indira Gandhi", "Lal Bahadur Shastri", "Jawaharlal Nehru"],
+    ["Which war ended in 1945?", "World War I", "World War II", "Cold War", "Vietnam War", "World War II"],
+    ["Who discovered America?", "Vasco da Gama", "Christopher Columbus", "Ferdinand Magellan", "James Cook", "Christopher Columbus"],
+    ["The Taj Mahal was built by which Mughal emperor?", "Akbar", "Shah Jahan", "Aurangzeb", "Babur", "Shah Jahan"],
+
+# Geography
+    ["Which is the smallest continent?", "Europe", "Australia", "Antarctica", "South America", "Australia"],
+    ["Which country has the largest population?", "USA", "India", "China", "Russia", "India"],
+    ["Which is the longest river in India?", "Ganga", "Yamuna", "Brahmaputra", "Godavari", "Ganga"],    
+    ["Which is the highest mountain in the world?", "K2", "Kangchenjunga", "Everest", "Makalu", "Everest"],
+    ["Which ocean lies between Africa and Australia?", "Atlantic", "Pacific", "Indian", "Arctic", "Indian"],
+
+# Sports
+    ["How many players are there in a cricket team?", "9", "10", "11", "12", "11"],
+    ["Who is known as the 'God of Cricket'?", "Virat Kohli", "Sachin Tendulkar", "MS Dhoni", "Ricky Ponting", "Sachin Tendulkar"],
+    ["Which country hosts Wimbledon?", "USA", "Australia", "UK", "France", "UK"],
+    ["In which sport is a shuttlecock used?", "Tennis", "Badminton", "Squash", "Table Tennis", "Badminton"],
+    ["How many rings are there in the Olympic symbol?", "4", "5", "6", "7", "5"],
+
+# Current Affairs & GK
+    ["Who is the CEO of Google (as of 2026)?", "Satya Nadella", "Sundar Pichai", "Elon Musk", "Tim Cook", "Sundar Pichai"],
+    ["Which country launched the Chandrayaan missions?", "USA", "Russia", "India", "China", "India"],
+    ["What does CPU stand for?", "Central Process Unit", "Central Processing Unit", "Computer Personal Unit", "Central Power Unit", "Central Processing Unit"],
+    ["Which is the largest democracy in the world?", "USA", "India", "Brazil", "UK", "India"],
+    ["What is the currency of Japan?", "Won", "Yuan", "Yen", "Dollar", "Yen"],
+
+# Miscellaneous
+    ["Which bird is known for its colorful feathers?", "Crow", "Peacock", "Sparrow", "Eagle", "Peacock"],
+    ["Which organ pumps blood in the human body?", "Lungs", "Brain", "Heart", "Liver", "Heart"],
+    ["How many days are there in a leap year?", "365", "366", "364", "360", "366"],
+    ["Which shape has three sides?", "Square", "Circle", "Triangle", "Rectangle", "Triangle"],
+    ["Which is the largest land animal?", "Elephant", "Lion", "Giraffe", "Rhino", "Elephant"],
+
+# Additional Mixed Questions
+    ["Which planet is closest to the Sun?", "Venus", "Earth", "Mercury", "Mars", "Mercury"],
+    ["Which is the national animal of India?", "Lion", "Tiger", "Elephant", "Leopard", "Tiger"],
+    ["Which festival is known as the festival of lights?", "Holi", "Eid", "Diwali", "Christmas", "Diwali"],
+    ["Which is the fastest land animal?", "Lion", "Cheetah", "Horse", "Tiger", "Cheetah"],
+    ["Which gas is essential for breathing?", "Carbon dioxide", "Oxygen", "Nitrogen", "Helium", "Oxygen"],
+
+    ["Which instrument is used to see distant objects?", "Microscope", "Telescope", "Periscope", "Binocular", "Telescope"],
+    ["Which is the tallest animal?", "Elephant", "Giraffe", "Horse", "Camel", "Giraffe"],
+    ["Which country is famous for pizza?", "France", "Italy", "USA", "Spain", "Italy"],
+    ["Which language is primarily spoken in Brazil?", "Spanish", "Portuguese", "English", "French", "Portuguese"],
+    ["Which is the largest planet in our solar system?", "Earth", "Jupiter", "Saturn", "Neptune", "Jupiter"],
+
+    ["Which vitamin is good for eyesight?", "Vitamin A", "Vitamin B", "Vitamin C", "Vitamin K", "Vitamin A"],
+    ["Which is the boiling point of water?", "90°C", "100°C", "80°C", "120°C", "100°C"],
+    ["Which animal is known as the king of the jungle?", "Tiger", "Lion", "Elephant", "Leopard", "Lion"],
+    ["Which direction does the sun rise from?", "West", "North", "East", "South", "East"],
+    ["Which is the largest bird?", "Eagle", "Ostrich", "Parrot", "Peacock", "Ostrich"],
+
+    ["Which is the national flower of India?", "Rose", "Lotus", "Lily", "Sunflower", "Lotus"],
+    ["Which is the smallest bone in the human body?", "Femur", "Stapes", "Tibia", "Skull", "Stapes"],
+    ["Which planet is known for its rings?", "Mars", "Saturn", "Jupiter", "Venus", "Saturn"],
+    ["Which metal is used to make wires?", "Copper", "Gold", "Iron", "Silver", "Copper"],
+    ["Which is the hardest natural substance?", "Iron", "Gold", "Diamond", "Silver", "Diamond"],
 ]
+
 
 for q in questions_data:
     Question.objects.get_or_create(
