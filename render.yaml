@@ -1,19 +1,11 @@
-databases:
-  - name: quizdb
-    plan: free
-
 services:
   - type: web
     name: django-quiz-app
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: python manage.py migrate && python manage.py populate_questions && gunicorn quizproject.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: gunicorn quizproject.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: quizdb
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG

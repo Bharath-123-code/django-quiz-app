@@ -147,3 +147,6 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Session Engine Configuration (Database-free signed cookie sessions)
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
