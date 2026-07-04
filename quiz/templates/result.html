@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quiz Results & Leaderboard</title>
     {% load static %}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -121,6 +123,52 @@
         .btn-retry:hover { opacity: 0.95; }
         @media (max-width: 920px) {
             .container { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            body {
+                background-attachment: scroll;
+            }
+            body > div {
+                padding: 16px 12px 40px;
+            }
+            .card {
+                padding: 20px 16px;
+                border-radius: 20px;
+            }
+            .score-banner h1 {
+                font-size: 1.8rem;
+            }
+            .score-val {
+                font-size: 3rem;
+                margin: 12px 0 6px;
+            }
+            .btn-retry {
+                width: 100%;
+                padding: 12px 20px;
+                border-radius: 14px;
+            }
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+            .review-item {
+                padding: 14px 16px;
+                border-radius: 14px;
+            }
+            .q-text {
+                font-size: 0.95rem;
+            }
+            .ans-row {
+                font-size: 0.9rem;
+            }
+            .label {
+                min-width: 90px;
+            }
         }
     </style>
 </head>

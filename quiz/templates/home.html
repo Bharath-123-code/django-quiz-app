@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ultimate Quiz</title>
     {% load static %}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,6 +18,10 @@
         }
         * { box-sizing: border-box; }
         body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
             background-image: 
             linear-gradient(135deg, rgba(78, 95, 190, 0.1) 0%, rgba(146, 99, 242,0.0) 100%),
             url("{% static 'quiz/hero_img.jpg' %}");
@@ -30,6 +36,9 @@
             inset: 0;
             background: rgba(5, 10, 35, 0.50);
             pointer-events: none;
+        }
+        .glass-card > * {
+            width: 100%;
         }
         .page-shell {
             position: relative;
@@ -211,13 +220,75 @@
         @media (max-width: 900px) {
             .hero-panel { grid-template-columns: 1fr; }
         }
+        @media (max-width: 600px) {
+            body {
+                background-attachment: scroll;
+            }
+            .page-shell {
+                padding: 0;
+                min-height: 100vh;
+                display: block;
+            }
+            .hero-panel {
+                min-height: 100vh;
+                gap: 0;
+            }
+            .glass-card {
+                border-radius: 0;
+                border: none;
+                width: 100%;
+                min-height: 100vh;
+                padding: 24px 16px;
+                justify-content: flex-start;
+                box-shadow: none;
+            }
+            .glass-card h1 {
+                font-size: 1.8rem;
+                margin-top: 10px;
+            }
+            .glass-card p {
+                font-size: 0.95rem;
+                margin-bottom: 24px;
+            }
+            .quiz-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .timer-circle {
+                width: 100%;
+                min-width: unset;
+                padding: 10px 16px;
+                font-size: 1rem;
+            }
+            .step-info {
+                text-align: center;
+                font-size: 1rem;
+                color: white;
+                text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            }
+            .option-label {
+                padding: 14px 16px;
+                margin: 10px 0;
+                font-size: 0.95rem;
+            }
+            .btn-row {
+                flex-direction: column-reverse;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            .btn {
+                width: 100%;
+                padding: 14px 20px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="page-shell">
     <div class="hero-panel">
         <div class="glass-card">
-            <div>
+            <div id="welcome-panel">
                 <h1>Welcome to the Quiz</h1>
                 <p>Please enter your name below and click Start Quiz to begin.</p>
             </div>
@@ -237,6 +308,7 @@
                 <form method="POST" id="quizForm">
                     {% csrf_token %}
                     <input type="hidden" name="player_name" id="hidden_name">
+                    <input type="hidden" name="question_ids" value="{% for q in questions %}{{ q.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
                     {% for q in questions %}
                     <div class="q-step {% if not forloop.first %}hidden{% endif %}" id="q-{{ forloop.counter0 }}">
                         <h3>{{ q.question_text }}</h3>
@@ -252,8 +324,9 @@
                             {% endif %}
                             {% if not forloop.last %}
                             <button type="button" class="btn" onclick="nextQ()">Next</button>
-                            {% endif %}
+                            {% else %}
                             <button type="submit" class="btn">Submit Quiz</button>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -268,13 +341,29 @@
     const steps = document.querySelectorAll('.q-step');
     let timeLeft = 30;
     let timer;
+    let lastTransitionTime = 0;
 
     function startQuiz() {
         const name = document.getElementById('p_name').value.trim();
         if (!name) return alert('Please enter your name to begin.');
         document.getElementById('hidden_name').value = name;
+        document.getElementById('welcome-panel').classList.add('hidden');
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('quiz-content').classList.remove('hidden');
+        
+        // Optionally request browser fullscreen mode on mobile/desktop
+        try {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+                document.documentElement.msRequestFullscreen();
+            }
+        } catch (e) {
+            console.log("Fullscreen request failed: ", e);
+        }
+        
         updateProgress();
         runTimer();
     }
@@ -296,6 +385,11 @@
     }
 
     function nextQ() {
+        const now = Date.now();
+        if (now - lastTransitionTime < 400) return; // Debounce rapid transition calls
+        lastTransitionTime = now;
+
+        clearInterval(timer);
         if (current < steps.length - 1) {
             steps[current].classList.add('hidden');
             current++;
@@ -308,6 +402,11 @@
     }
 
     function prevQ() {
+        const now = Date.now();
+        if (now - lastTransitionTime < 400) return; // Debounce rapid transition calls
+        lastTransitionTime = now;
+
+        clearInterval(timer);
         if (current === 0) return;
         steps[current].classList.add('hidden');
         current--;
