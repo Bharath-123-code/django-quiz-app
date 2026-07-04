@@ -70,3 +70,34 @@ def home(request):
     return render(request, 'home.html', {
         'questions': questions
     })
+
+from django.http import JsonResponse
+from django.db import connection
+import os
+
+def debug_deploy(request):
+    info = {
+        'DATABASE_URL_PRESENT': 'DATABASE_URL' in os.environ,
+        'DATABASE_URL_VALUE': os.environ.get('DATABASE_URL', '')[:30] + '...' if 'DATABASE_URL' in os.environ else None,
+        'DEBUG': os.environ.get('DEBUG'),
+        'RENDER': os.environ.get('RENDER'),
+        'DB_SETTINGS': {
+            'ENGINE': connection.settings_dict.get('ENGINE'),
+            'NAME': connection.settings_dict.get('NAME'),
+            'HOST': connection.settings_dict.get('HOST'),
+            'PORT': connection.settings_dict.get('PORT'),
+            'USER': connection.settings_dict.get('USER'),
+        }
+    }
+    try:
+        from quiz.models import Question, HighScore
+        info['QUESTION_COUNT'] = Question.objects.count()
+        info['HIGHSCORE_COUNT'] = HighScore.objects.count()
+        info['CONNECTION_OK'] = True
+    except Exception as e:
+        import traceback
+        info['CONNECTION_OK'] = False
+        info['ERROR'] = str(e)
+        info['TRACEBACK'] = traceback.format_exc()
+        
+    return JsonResponse(info)
