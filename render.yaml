@@ -7,8 +7,8 @@ services:
     name: django-quiz-app
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py populate_questions
-    startCommand: gunicorn quizproject.wsgi:application --bind 0.0.0.0:$PORT
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate && python manage.py populate_questions && gunicorn quizproject.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DATABASE_URL
         fromDatabase:
