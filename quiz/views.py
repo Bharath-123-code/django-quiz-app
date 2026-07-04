@@ -89,20 +89,3 @@ def home(request):
         'questions': questions,
         'leaderboard': leaderboard_display
     })
-
-from django.http import JsonResponse
-import os
-
-def debug_deploy(request):
-    with LEADERBOARD_LOCK:
-        lead_len = len(LEADERBOARD)
-    info = {
-        'DATABASE_URL_PRESENT': 'DATABASE_URL' in os.environ,
-        'DATABASE_URL_VALUE': os.environ.get('DATABASE_URL', '')[:30] + '...' if 'DATABASE_URL' in os.environ else None,
-        'DEBUG': os.environ.get('DEBUG'),
-        'RENDER': os.environ.get('RENDER'),
-        'QUESTIONS_IN_MEMORY': len(QUESTIONS),
-        'LEADERBOARD_ENTRIES_IN_MEMORY': lead_len,
-        'MODE': 'Database-Free'
-    }
-    return JsonResponse(info)
