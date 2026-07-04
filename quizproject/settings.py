@@ -89,11 +89,6 @@ DATABASES = {
     )
 }
 
-# Enable SSL connection for PostgreSQL when on Render
-if os.environ.get('DATABASE_URL') and not os.environ.get('DATABASE_URL', '').startswith('sqlite:'):
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'require',
-    }
 
 
 # Password validation
